@@ -52,11 +52,13 @@
         </div>
 
         <script>
-          // Script para definir a data atual como padrão se o campo estiver vazio
+          // Definir a data atual no horário de Brasília (GMT-3)
           window.onload = function() {
               var dateInput = document.getElementById('id_date');
               if (!dateInput.value) {
-                  var today = new Date().toISOString().split('T')[0];
+                  var now = new Date();
+                  now.setHours(now.getHours() - now.getTimezoneOffset() / 60 - 3); // Ajusta para GMT-3
+                  var today = now.toISOString().split('T')[0];
                   dateInput.value = today;
               }
           };

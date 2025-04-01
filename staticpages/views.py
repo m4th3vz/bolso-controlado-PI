@@ -10,7 +10,7 @@ class WelcomeView(TemplateView):
     template_name = 'staticpages/welcome.html'
     
     def get(self, request, *args, **kwargs):
-        api_key = config('API_KEY')
+        api_key = config('BOLSA_API_KEY')
         url = f'https://api.polygon.io/v1/open-close/I:NDX/2024-04-05?apiKey={api_key}'
 
         try:

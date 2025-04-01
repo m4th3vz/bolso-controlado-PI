@@ -34,9 +34,6 @@ PAYMENT_CHOICES = (
 )
 
 # Modelo para representar uma despesa
-from django.db import models
-from django.contrib.auth.models import User
-
 class Expense(models.Model):
     expense_category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, verbose_name='Categoria', default='categoria1')
     title = models.CharField(max_length=30, verbose_name='Título')
@@ -54,14 +51,40 @@ class Expense(models.Model):
     def __str__(self):
         return self.title
 
-    
-from django.db import models
-from django.contrib.auth.models import User
 
+# Modelo para representar um usuário
 class UserProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='user_profile')  # Adicione related_name
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='user_profile')
     salary = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
     def __str__(self):
         return self.user.username
 
+
+# Dashboard Financeiro
+class Transaction(models.Model):
+    TRANSACTION_TYPES = [
+        ('expense', 'Expense'),
+    ]
+
+    CATEGORY_CHOICES = [
+        ('essential', 'Essential Expenses'),
+        ('fixed', 'Fixed Expenses'),
+        ('pharmacy', 'Pharmacy'),
+        ('transport', 'Transport'),
+        ('maintenance', 'Maintenance'),
+        ('market', 'Market'),
+        ('education', 'Education'),
+        ('entertainment', 'Entertainment'),
+    ]
+
+    type = models.CharField(max_length=10, choices=TRANSACTION_TYPES)
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    description = models.TextField(blank=True, null=True)
+    date = models.DateField()
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.type} - {self.category} - {self.amount} - {self.user.username}"
+    

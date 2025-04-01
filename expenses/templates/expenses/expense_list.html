@@ -156,4 +156,278 @@
         </div>
     </div>
 </div>
+
+<!-- Dashboard Financeiro -->
+
+<div class="chart-body" style="padding-top: 80px;">
+  <div class="chart-container">
+    <h1 class="chart-title">Painel Financeiro</h1>
+  
+    <!-- Formulário de Cadastro de Transação -->
+    <form id="transactionForm" method="POST">
+      {% csrf_token %}
+      <label for="type">Tipo:</label>
+      <select id="type" class="chart-select" required>
+        <option value="despesa">Despesa</option>
+      </select>
+    
+      <label for="category">Categoria:</label>
+      <select id="category" class="chart-select" required>
+        <option value="gastos essenciais">Gastos Essenciais</option>
+        <option value="gastos fixos">Gastos Fixos</option>
+        <option value="gastos farmácia">Gastos Farmácia</option>
+        <option value="gastos com locomoção">Gastos com Locomoção</option>
+        <option value="gastos com manutenção">Gastos com Manutenção</option>
+        <option value="gastos com mercado">Gastos com Mercado</option>
+        <option value="gastos com educação">Gastos com Educação</option>
+        <option value="gastos com entretenimento">Gastos com Entretenimento</option>
+      </select>
+      
+      <label for="amount">Valor:</label>
+      <input type="number" id="amount" step="0.01" required>
+      
+      <label for="description">Descrição:</label>
+      <input type="text" id="description" placeholder="Opcional">
+      
+      <label for="date">Data:</label>
+      <input type="date" id="date" required>
+
+      <script>
+        // Definir a data atual no horário de Brasília (GMT-3)
+        window.onload = function() {
+            var dateInput = document.getElementById('date');
+            if (!dateInput.value) {
+                var now = new Date();
+                now.setHours(now.getHours() - now.getTimezoneOffset() / 60 - 3); // Ajusta para GMT-3
+                var today = now.toISOString().split('T')[0];
+                dateInput.value = today;
+            }
+        };
+      </script>
+      
+      <button type="submit" class="chart-button">Cadastrar</button>
+    </form>
+    
+    <!-- Filtros -->
+    <div class="chart-filters">
+      <label for="categoryFilter">Filtrar por Categoria:</label>
+      <select id="categoryFilter" class="chart-select">
+        <option value="all">Todas</option>
+        <option value="gastos essenciais">Gastos Essenciais</option>
+        <option value="gastos fixos">Gastos Fixos</option>
+        <option value="gastos farmácia">Gastos Farmácia</option>
+        <option value="gastos com locomoção">Gastos com Locomoção</option>
+        <option value="gastos com manutenção">Gastos com Manutenção</option>
+        <option value="gastos com mercado">Gastos com Mercado</option>
+        <option value="gastos com educação">Gastos com Educação</option>
+        <option value="gastos com entretenimento">Gastos com Entretenimento</option>
+      </select>
+      <button id="clearGraph" class="chart-button">Apagar meu gráfico</button>
+    </div>
+    
+    <!-- Gráfico -->
+    <canvas id="expensesChart"></canvas>
+    
+    <!-- Contêiner responsivo para a tabela -->
+<div class="chart-table-container">
+  <table class="chart-table">
+    <thead>
+      <tr>
+        <th class="chart-th">ID</th>
+        <th class="chart-th">Tipo</th>
+        <th class="chart-th">Categoria</th>
+        <th class="chart-th">Valor</th>
+        <th class="chart-th">Descrição</th>
+        <th class="chart-th">Data</th>
+      </tr>
+    </thead>
+    <tbody id="transactionsTableBody">
+      <tr>
+        <td class="chart-td"></td>
+        <td class="chart-td"></td>
+        <td class="chart-td"></td>
+        <td class="chart-td"></td>
+        <td class="chart-td"></td>
+        <td class="chart-td"></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+  </div>
+</div>
+
+  <!-- Script JS -->
+  <script>
+    // Função para obter o token CSRF
+    function getCsrfToken() {
+      return document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+    }
+  
+    let expensesChart = null; // Variável global para armazenar o gráfico atual
+  
+    // Função para definir a data atual no campo de data
+    function setCurrentDate() {
+      const today = new Date().toISOString().split('T')[0]; // Pega a data de hoje no formato yyyy-mm-dd
+      document.getElementById('date').value = today; // Preenche o campo de data com a data de hoje
+    }
+  
+    // Atualiza o gráfico com os dados filtrados
+    function renderChart(transactions) {
+      const expensesChartCtx = document.getElementById('expensesChart').getContext('2d');
+  
+      const categories = {};
+      transactions.forEach(t => {
+        if (t.type === 'despesa') {
+          categories[t.category] = (categories[t.category] || 0) + parseFloat(t.amount);
+        }
+      });
+  
+      const labels = Object.keys(categories);
+      const data = Object.values(categories);
+  
+      // Verifica se já existe um gráfico e o destrói antes de criar um novo
+      if (expensesChart !== null) {
+        expensesChart.destroy();
+      }
+  
+      expensesChart = new Chart(expensesChartCtx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Gastos',
+            data: data,
+            backgroundColor: 'rgba(106, 13, 173, 0.5)',
+            borderColor: 'rgba(106, 13, 173, 1)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    }
+  
+    // Função para buscar transações e retornar os dados
+    async function fetchTransactions() {
+      try {
+        const response = await fetch('/api/transactions');
+        const transactions = await response.json();
+        renderTable(transactions);
+        renderChart(transactions); // Renderiza todas as despesas inicialmente
+        return transactions; // Retorna os dados para serem usados no filtro
+      } catch (error) {
+        console.error('Erro ao buscar transações:', error);
+        return [];
+      }
+    }
+  
+    // Filtrar o gráfico ao mudar de categoria
+    document.getElementById('categoryFilter').addEventListener('change', async function () {
+      const selectedCategory = this.value;
+      const transactions = await fetchTransactions();
+      const filteredTransactions = selectedCategory === 'all'
+        ? transactions
+        : transactions.filter(t => t.category === selectedCategory);
+  
+      renderChart(filteredTransactions); // Atualiza o gráfico
+    });
+  
+    // Renderiza a tabela com as transações
+    function renderTable(transactions) {
+      const transactionsTableBody = document.getElementById('transactionsTableBody');
+      transactionsTableBody.innerHTML = '';
+      transactions.forEach(t => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${t.id}</td>
+          <td>${t.type}</td>
+          <td>${t.category}</td>
+          <td>${t.amount}</td>
+          <td>${t.description}</td>
+          <td>${t.date}</td>
+        `;
+        transactionsTableBody.appendChild(row);
+      });
+    }
+  
+    // Enviar a nova transação
+    async function addTransaction(event) {
+      event.preventDefault();
+      const csrfToken = getCsrfToken();  // Obtém o token CSRF
+  
+      const newTransaction = {
+        type: document.getElementById('type').value,
+        category: document.getElementById('category').value,
+        amount: parseFloat(document.getElementById('amount').value),
+        description: document.getElementById('description').value || "", // Define como uma string vazia se estiver vazio
+        date: document.getElementById('date').value
+      };
+  
+      try {
+        const response = await fetch('/api/transactions/add/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+          },
+          body: JSON.stringify(newTransaction)
+        });
+  
+        if (response.ok) {
+          document.getElementById('transactionForm').reset();
+          setCurrentDate(); // Atualiza a data automaticamente após a submissão
+          const transactions = await fetchTransactions(); // Atualiza a tabela e gráfico sem recarregar
+          renderChart(transactions);
+        } else {
+          console.error('Erro ao cadastrar transação');
+        }
+      } catch (error) {
+        console.error('Erro na requisição:', error);
+      }
+    }
+  
+    // Adiciona o evento ao formulário de cadastro de transação
+    document.getElementById('transactionForm').addEventListener('submit', addTransaction);
+  
+    // Busca as transações assim que a página carrega
+    fetchTransactions();
+  
+    // Função para apagar as transações do usuário logado
+    async function clearUserTransactions() {
+      if (!confirm("Tem certeza de que deseja apagar todas as suas transações?")) {
+        return;
+      }
+  
+      try {
+        const response = await fetch('/api/transactions/delete/', {
+          method: 'DELETE',
+          headers: {
+            'X-CSRFToken': getCsrfToken() // Obtém o token CSRF
+          }
+        });
+  
+        if (response.ok) {
+          // Recarregar a página para atualizar o gráfico e a tabela
+          location.reload(); // Recarrega a página
+        } else {
+          console.error('Erro ao apagar transações');
+        }
+      } catch (error) {
+        console.error('Erro na requisição:', error);
+      }
+    }
+  
+    // Adiciona o evento ao botão de limpar gráfico
+    document.getElementById('clearGraph').addEventListener('click', clearUserTransactions);
+  
+    // Definir a data automaticamente ao carregar a página
+    window.addEventListener('load', setCurrentDate); // Define a data quando a página carrega
+  </script>
+  
 {% endblock content %}

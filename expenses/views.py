@@ -9,6 +9,9 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import ListView, CreateView, DeleteView
+from django.http import JsonResponse
+from .models import Transaction
+import json
 
 # Lista de despesas
 class ExpenseListView(LoginRequiredMixin, ListView):
@@ -133,3 +136,58 @@ class ConfirmDeleteExpensesView(LoginRequiredMixin, View):
         # Exclui todas as despesas do usuário logado
         Expense.objects.filter(user=request.user).delete()
         return redirect('expense_list')
+
+# ------------------------------------------------------------
+
+# Classe para retornar transações do usuário logado
+class GetTransactionsView(LoginRequiredMixin, View):
+    def get(self, request):
+        # Filtra as transações para o usuário logado
+        transactions = Transaction.objects.filter(user=request.user)
+        return JsonResponse(list(transactions.values()), safe=False)
+
+# Classe para adicionar transação associada ao usuário logado
+class AddTransactionView(LoginRequiredMixin, View):
+    def post(self, request):
+        data = json.loads(request.body)
+        
+        # Salvar a transação no banco associada ao usuário logado
+        transaction = Transaction.objects.create(
+            type=data['type'],
+            category=data['category'],
+            amount=data['amount'],
+            description=data['description'],
+            date=data['date'],
+            user=request.user
+        )
+        
+        return JsonResponse({'message': 'Transação cadastrada com sucesso!'}, status=201)
+
+# Classe para renderizar o gráfico
+class ChartView(LoginRequiredMixin, View):
+    def get(self, request):
+        # Filtra as transações para o usuário logado
+        transactions = Transaction.objects.filter(user=request.user)
+        
+        # Organiza as categorias e valores para o gráfico
+        categories = [transaction.category for transaction in transactions]
+        amounts = [transaction.amount for transaction in transactions]
+        
+        # Passa os dados para o template
+        return render(request, "chart.html", {
+            "categories": categories,
+            "amounts": amounts,
+        })
+
+# Classe para deletar todas as transações do usuário logado
+class DeleteUserTransactionsView(LoginRequiredMixin, View):
+    def delete(self, request):
+        # Apagar apenas as transações do usuário logado
+        Transaction.objects.filter(user=request.user).delete()
+        return JsonResponse({'message': 'Todas as suas transações foram apagadas com sucesso!'}, status=200)
+
+# Classe para atualizar o gráfico com AJAX
+class TransactionListView(View):
+    def get(self, request, *args, **kwargs):
+        transactions = Transaction.objects.filter(type="despesa").values('id', 'category', 'amount', 'description', 'date')
+        return JsonResponse(list(transactions), safe=False)

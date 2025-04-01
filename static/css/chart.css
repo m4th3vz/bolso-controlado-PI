@@ -1,0 +1,115 @@
+.chart-body {
+  font-family: Arial, sans-serif;
+  background-color: #fff;
+  color: #333;
+  margin: 0;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.chart-container {
+  max-width: 900px;
+  margin: 0 auto;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.chart-title {
+  text-align: center;
+  color: #6a0dad;
+}
+
+.chart-filters {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  margin-bottom: 20px;
+}
+
+.chart-filters label {
+  margin-bottom: 5px;
+}
+
+.chart-select, .chart-button {
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #6a0dad;
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+.chart-button {
+  background-color: #6a0dad;
+  color: #fff;
+  cursor: pointer;
+  border: none;
+  width: auto;
+  margin-top: 10px;
+}
+
+/* Contêiner responsivo para a tabela */
+.chart-table-container {
+  width: 100%;
+  overflow-x: auto; /* Permite rolagem horizontal se necessário */
+  display: block;
+}
+
+/* Estilos da tabela */
+.chart-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px; /* Evita que as colunas fiquem muito estreitas */
+}
+
+.chart-th, .chart-td {
+  border: 1px solid #ccc;
+  text-align: center;
+  padding: 8px;
+  word-wrap: break-word; /* Permite quebra de texto */
+  white-space: nowrap; /* Impede que o texto quebre em várias linhas */
+}
+
+.chart-table, .chart-th, .chart-td {
+  border: 1px solid #ccc;
+  text-align: center;
+}
+
+.chart-th {
+  background-color: #6a0dad;
+  color: #fff;
+  border-radius: 5px 5px 0 0;
+}
+
+/* Ajustes para telas menores */
+@media (max-width: 600px) {
+  .chart-th, .chart-td {
+    font-size: 12px; /* Reduz o tamanho da fonte para caber melhor */
+    padding: 6px;
+  }
+}
+
+  .chart-filters {
+    width: 100%;
+    margin-bottom: 15px;
+  }
+
+  .chart-select, .chart-button {
+    width: 100%;
+    padding: 12px;
+    font-size: 14px;
+  }
+
+  /* Ajustando o gráfico */
+  #expensesChart {
+    width: 100% !important;
+    height: auto !important;
+  }
+
+  .chart-table {
+    margin-top: 15px;
+    overflow-x: auto;
+  }
