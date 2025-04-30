@@ -9,4 +9,5 @@ urlpatterns = [
     path('', include('calculator.urls')),
     path('', include('staticpages.urls')),
     path('', include('shopping_list.urls')),
+    path('', include('chatbot.urls')),
 ]

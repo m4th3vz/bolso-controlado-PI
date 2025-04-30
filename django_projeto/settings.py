@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'calculator.apps.CalculatorConfig',
     'staticpages.apps.StaticpagesConfig',
     'shopping_list.apps.ShoppingListConfig',
+    'chatbot.apps.ChatbotConfig',
 ]
 
 MIDDLEWARE = [

@@ -266,16 +266,10 @@
   
     let expensesChart = null; // Variável global para armazenar o gráfico atual
   
-    // Função para definir a data atual no campo de data
-    function setCurrentDate() {
-      const today = new Date().toISOString().split('T')[0]; // Pega a data de hoje no formato yyyy-mm-dd
-      document.getElementById('date').value = today; // Preenche o campo de data com a data de hoje
-    }
-  
     // Atualiza o gráfico com os dados filtrados
     function renderChart(transactions) {
       const expensesChartCtx = document.getElementById('expensesChart').getContext('2d');
-  
+
       const categories = {};
       transactions.forEach(t => {
         if (t.type === 'despesa') {

@@ -111,21 +111,45 @@
                 <!-- Imagem da lista de compras -->
                 <img src="{% static 'img/lista.png'%}" alt="Lista de Compras" class="card-img-top" style="width: 60%;">
                 <h5 style="font-size: 17px;" class="card-title"><strong>Lista de compras</strong></h5>
-                <p style="font-size: 15px;" class="card-text">Gerencie sua lista de compras</p>
+                <h6 style="font-size: 15px;" class="card-text">Gerencie sua lista de compras</h6>
             </div>
         </a>
     </div>
         <div class="col-md-6 mb-3">
-          <a href="{% url 'news' %}" class="card mx-auto" style="text-decoration: none;">
+          <a href="{% url 'chatbot' %}" class="card mx-auto" style="text-decoration: none;">
             <div class="card-body text-center">
                 <!-- Imagem de Notícias -->
-                <img src="{% static 'img/grafico.png'%}" alt="Notícias" class="card-img-top" style="width: 50%;">
-                  <h5 style="font-size: 17px;" class="card-title"><strong>Notícias</strong></h5>
-                  <p style="font-size: 15px;" class="card-text">Fique atualizado com notícias de investimentos e negócios</p>
+                <img src="{% static 'img/chatbot.png'%}" alt="Notícias" class="card-img-top" style="width: 50%;">
+                  <h5 style="font-size: 17px;" class="card-title"><strong>Chatbot</strong></h5>
+                  <h6 style="font-size: 15px;" class="card-text">Tire suas dúvidas com nossa inteligência artificial</h6>
             </div>
         </a>
         </div>
     </div>
+</div>
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-md-6 mb-3">
+      <a href="{% url 'news' %}" class="card mx-auto" style="text-decoration: none;">
+        <div class="card-body text-center">
+            <!-- Imagem de Notícias -->
+            <img src="{% static 'img/grafico.png'%}" alt="Notícias" class="card-img-top" style="width: 50%;">
+              <h5 style="font-size: 17px;" class="card-title"><strong>Notícias</strong></h5>
+              <h6 style="font-size: 15px;" class="card-text">Fique atualizado com notícias de investimentos e negócios</h6>
+          </div>
+      </a>
+      </div>
+      <div class="col-md-6 mb-3">
+        <a href="{% url 'about' %}" class="card mx-auto" style="text-decoration: none;">
+          <div class="card-body text-center">
+              <!-- Imagem de Sobre -->
+              <img src="{% static 'img/luz.png'%}" alt="Sobre" class="card-img-top" style="width: 60%;">
+                <h5 style="font-size: 17px;" class="card-title"><strong>Sobre</strong></h5>
+                <h6 style="font-size: 15px;" class="card-text">Entenda um pouco sobre este projeto</h6>
+          </div>
+      </a>
+      </div>
+  </div>
 </div>
 
 <!-- Divisor horizontal -->

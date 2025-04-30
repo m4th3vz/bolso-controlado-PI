@@ -1,0 +1,245 @@
+<!-- chatbot/chatbot.html -->
+{% extends 'base-6.html' %}
+
+{% load static %}
+
+{% block page_title %}
+    Chatbot Financeiro
+{% endblock page_title %}
+
+{% block content %}
+
+<div id="banner">
+    <h1 id="cor-letra-banner">Chatbot Financeiro</h1>
+    <p id="cor-letra-banner">Tire suas dúvidas com nossa inteligência artificial.</p>
+</div>
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    .main-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        position: relative;
+    }
+
+    .chat-container {
+        flex: 1;
+        overflow-y: auto;
+        padding: 40px 0;
+        margin-bottom: 120px;
+    }
+
+    .message-group {
+        display: flex;
+        padding: 20px;
+        gap: 20px;
+    }
+
+    .message-group.user {
+        background: #f7f7f8;
+    }
+
+    .message-group.bot {
+        background: #ffffff;
+    }
+
+    .avatar {
+        width: 30px;
+        height: 30px;
+        border-radius: 2px;
+        background: #10a37f;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: white;
+    }
+
+    .avatar.user {
+        background: #5c5c5c;
+    }
+
+    .message-content {
+        flex: 1;
+        max-width: 800px;
+        margin: 0 auto;
+        width: 100%;
+        line-height: 1.6;
+    }
+
+    .input-container {
+        position: fixed;
+        bottom: 30px;  /* padrão para monitores */
+        left: 0;
+        right: 0;
+        max-width: 700px;
+        margin: 0 auto;
+        padding: 20px;
+        background: #ffffff;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        align-items: flex-start;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Ajuste para telas menores, como celulares */
+    @media (max-width: 600px) {
+        .input-container {
+            bottom: 0px;
+        }
+    }    
+
+    .input-box {
+        max-width: 740px;
+        width: 90%;
+    }
+
+    .input-box textarea {
+        width: 100%;
+        padding: 16px;
+        border-radius: 6px;
+        border: 1px solid #e5e5e5;
+        background: #ffffff;
+        color: #333;
+        font-size: 16px;
+        resize: none;
+        height: 52px;
+        line-height: 1.2;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.05);
+    }
+
+    .input-box textarea:focus {
+        outline: none;
+        border-color: #10a37f;
+        box-shadow: 0 0 5px rgba(16, 163, 127, 0.1);
+    }
+
+    .input-box textarea::placeholder {
+        color: #999;
+    }
+
+    .send-button {
+        background: #10a37f;
+        border: none;
+        color: #fff;
+        cursor: pointer;
+        padding: 14px;
+        border-radius: 6px;
+        height: 52px;
+        width: 52px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.05);
+    }
+
+    .send-button:hover {
+        background: #0e906f;
+    }
+
+    .send-button svg {
+        width: 20px;
+        height: 20px;
+    }
+</style>
+
+<main class="main-content">
+    <div class="chat-container" id="chatContainer">
+        <div class="message-group bot">
+            <div class="avatar">AI</div>
+            <div class="message-content">
+                Olá! Como posso ajudar você hoje com suas finanças?
+            </div>
+        </div>
+    </div>
+
+    <div class="input-container">
+        <div class="input-box">
+            <textarea 
+                id="userInput" 
+                placeholder="Digite uma mensagem..."
+                rows="1"
+                onkeydown="if(event.keyCode === 13 && !event.shiftKey) { event.preventDefault(); sendMessage(); }"></textarea>
+        </div>
+        <button class="send-button" onclick="sendMessage()">
+            <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+        </button>
+    </div>
+</main>
+
+<script>
+    async function sendMessage() {
+        const input = document.getElementById('userInput');
+        const message = input.value.trim();
+        
+        if (message === '') return;
+
+        // Adiciona mensagem do usuário
+        addMessage(message, 'user');
+        input.value = '';
+        input.style.height = '52px';
+
+        // Obter o token CSRF do meta tag
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+
+        try {
+            const response = await fetch("/api/chat/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": csrfToken,
+                },
+                body: JSON.stringify({ message })
+            });
+
+            if (!response.ok) throw new Error("Erro ao obter resposta do servidor");
+
+            const data = await response.json();
+            // Adiciona resposta do bot
+            addMessage(data.response, 'bot');
+        } catch (error) {
+            addMessage("Erro: Não foi possível obter uma resposta.", 'bot');
+        }
+    }
+
+    function addMessage(text, type) {
+        const container = document.getElementById('chatContainer');
+        const messageGroup = document.createElement('div');
+        messageGroup.className = `message-group ${type}`;
+        
+        const avatar = document.createElement('div');
+        avatar.className = `avatar ${type}`;
+        avatar.textContent = type === 'bot' ? 'AI' : 'U';
+        
+        const messageContent = document.createElement('div');
+        messageContent.className = 'message-content';
+        messageContent.textContent = text;
+        
+        messageGroup.appendChild(avatar);
+        messageGroup.appendChild(messageContent);
+        container.appendChild(messageGroup);
+        
+        container.scrollTop = container.scrollHeight;
+    }
+
+    // Auto-resize textarea
+    const textarea = document.getElementById('userInput');
+    textarea.addEventListener('input', function() {
+        this.style.height = '52px';
+        this.style.height = (this.scrollHeight) + 'px';
+    });
+</script>
+{% endblock content %}

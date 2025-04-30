@@ -26,3 +26,35 @@ Tatiane Costa Bordinhão | 2202013
 <div align="center">
     <img src="https://github.com/m4th3vz/bolso-controlado-PI/assets/109554163/bd324ffd-03a2-47c8-959b-6805c73752b9" />
 </div>
+
+# Como Abrir o Projeto Django
+
+Para iniciar e executar o projeto Django em seu ambiente local, siga estas instruções:
+
+## Pré-requisitos
+- Python instalado
+- pip (gerenciador de pacotes do Python)
+- Git (opcional, para clonar o repositório)
+
+## Passos para Execução
+
+### 1. Instalar as Dependências
+Primeiro, instale todas as dependências necessárias utilizando o pip:
+
+```bash
+pip install -r requirements.txt
+```
+
+### 2. Iniciar o Servidor de Desenvolvimento
+Depois de instalar as dependências, inicie o servidor de desenvolvimento Django:
+
+```bash
+python manage.py runserver
+```
+
+### 3. Acessar o Projeto
+Após iniciar o servidor com sucesso, você poderá acessar o projeto através do navegador no seguinte endereço:
+
+[http://127.0.0.1:8000/](http://127.0.0.1:8000/)
+
+O projeto agora está em execução localmente em seu computador!
