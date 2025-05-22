@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django.views import View
 import google.generativeai as genai
 from django.views.generic import TemplateView
-from decouple import config
+from decouple import config # Em produção remova o 'from decouple import config'
 
 # Página principal
 class ChatbotView(TemplateView):
@@ -18,6 +18,8 @@ class ChatbotView(TemplateView):
 # Configure o modelo usando a chave da variável de ambiente
 api_key = config("GEMINI_API_KEY")
 genai.configure(api_key=api_key)
+# Em produção remova 'api_key = config("GEMINI_API_KEY")' e use o genai.configure(api_key="Chave API aqui!")
+# pip install google-generativeai
 
 generation_config = {
     "temperature": 0,
